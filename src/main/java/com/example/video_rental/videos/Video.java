@@ -28,6 +28,9 @@ public class Video {
 
     public boolean isAvailable()
     {
+        if (copies == null) {
+            return false; // or true, depending on what makes sense for your application
+        }
         return (copies - rentals.size()) > 0;
     }
 }
