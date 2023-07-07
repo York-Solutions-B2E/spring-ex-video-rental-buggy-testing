@@ -1,0 +1,45 @@
+1: The unit test that caught this error
+2: A description of this error
+3: What file/method the bug was found in
+4: What result you got and what result you expected
+5: An updated version of the code fixing the bug
+
+
+1: The unit test that caught this error
+
+    @Test
+    void itShouldGetActionVideosForAction() {
+        // given
+        Iterable<Video> action = List.of(savedVideo1, savedVideo2);
+
+        // when
+        Iterable<Video> expected = underTest.findAllByGenre("action");
+
+        // then
+        assertThat(expected).containsExactlyInAnyOrderElementsOf(action);
+    }
+
+2: A description of this error
+
+ It gave an error (Named parameter not bound : genres) when the test should have passed.
+
+	@Query("SELECT v FROM Video v JOIN v.genres g WHERE g=:genres")
+    	Iterable<Video> findAllByGenre(@Param("genre") String genre);
+
+	the :genre in the query doesn't have a value passed into it because it doesn't 	match the @Param
+
+
+3. 3: What file/method the bug was found in
+
+VideoRepository.java
+
+4: What result you got and what result you expected
+
+The result was an error, the expected was that the genre list I created to compare matched the result
+
+5: An updated version of the code fixing the bug
+
+      @Query("SELECT v FROM Video v JOIN v.genres g WHERE g=:genre")
+      Iterable<Video> findAllByGenre(@Param("genre") String genre);
+
+

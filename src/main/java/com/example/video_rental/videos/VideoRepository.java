@@ -9,6 +9,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VideoRepository extends CrudRepository<Video,Long>
 {
-    @Query("SELECT v FROM Video v JOIN v.genres g WHERE g=:genres")
-    Iterable<Video> findAllByGenre(@Param("genre") String genre);
+//    @Query("SELECT v FROM Video v JOIN v.genres g WHERE g=:genres")
+//    Iterable<Video> findAllByGenre(@Param("genre") String genre);
+
+        @Query("SELECT v FROM Video v JOIN v.genres g WHERE g=:genre")
+        Iterable<Video> findAllByGenre(@Param("genre") String genre);
+
+
 }

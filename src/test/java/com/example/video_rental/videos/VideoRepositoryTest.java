@@ -34,6 +34,7 @@ class VideoRepositoryTest {
         video1.genres = genres1;
         video1.copies = 10;
 
+        // Had to save videos to match reference variable of videos returned from queries
         savedVideo1 = underTest.save(video1);
 
         Set<String> genres2 = Set.of("Action", "Sci-Fi");
@@ -55,10 +56,11 @@ class VideoRepositoryTest {
     @Test
     void itShouldGetActionVideosForAction() {
         // given
-        Iterable<Video> action = List.of(savedVideo1);
+        // Making a list to compare the outcome to
+        Iterable<Video> action = List.of(savedVideo1, savedVideo2);
 
         // when
-        Iterable<Video> expected = underTest.findAllByGenre("action");
+        Iterable<Video> expected = underTest.findAllByGenre("Action");
 
         // then
         assertThat(expected).containsExactlyInAnyOrderElementsOf(action);
