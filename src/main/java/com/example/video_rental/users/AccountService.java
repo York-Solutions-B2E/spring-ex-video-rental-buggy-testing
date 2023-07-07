@@ -17,10 +17,14 @@ public class AccountService
 
 
     private static final Integer length = 25;
+
+    //           token     userId
+    //           Key type, value type
     private final Map<String, Long> userTokenMap;
     private final AccountRepository repo;
 
-    @Autowired
+                // will need to inject a bean into the marked field
+    @Autowired // a bean is an object managed by Spring (@Controller, etc)
     public AccountService(AccountRepository repo)
     {
         this.userTokenMap = new HashMap<>();
@@ -32,6 +36,7 @@ public class AccountService
     }
     public Account login(String username, String password) throws AccountException
     {
+        // var infers type from right side (in this case an Optional<Account>)
         var user = this.repo.getUserByPassword(username);
         if (user.isEmpty() || !user.get().password.equals(password))
         {
@@ -41,13 +46,16 @@ public class AccountService
         this.updateToken(u);
         return u;
     }
+
+    // Token represents a logged in session
     private void updateToken(Account u)
     {
         u.token = generateRandomToken();
+        // now you can reference the logged-in user by their session token
         this.userTokenMap.put(u.token,u.id);
     }
 
-    @Transactional
+    @Transactional // roll back all changes if an error occurs
     public Account register(String username, String password)
     {
 
@@ -56,9 +64,11 @@ public class AccountService
         {
             throw new AccountException.InvalidLoginException("Username is already taken");
         }
-
+        // no password validation. is that usually done on the frontend?
+        // Must have been left out because a real implementation would involve a hashed password
         Account u = new Account(null,username,password,new ArrayList<>(), Account.ACCOUNT_TYPE.Standard);
         this.repo.save(u);
+        // login automatically upon registration
         this.updateToken(u);
         return u;
     }
@@ -72,10 +82,12 @@ public class AccountService
         }
         return this.repo.findAll();
     }
+
     public boolean isUserAdmin(Account account)
     {
         return account.accountType == Account.ACCOUNT_TYPE.Admin;
     }
+
     public Account getUserFromToken(String token)
     {
         Optional<Long> maybeUser = Optional.ofNullable(userTokenMap.get(token));
@@ -84,6 +96,7 @@ public class AccountService
             throw new AccountException.BadTokenException("Token not found, login likely expired");
         }
         Account matchedAccount = this.repo.findById(maybeUser.get()).get();
+        // associates the token with the user outside the hashmap
         matchedAccount.token = token;
         return matchedAccount;
     }

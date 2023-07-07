@@ -42,6 +42,8 @@ public class RentalService
         Rental rental = new Rental(null,video, account, new Date(), cal.getTime());
         rental.video = video;
         rental.account = account;
+
+        // Updates bidirectional relationships
         account.rentals.add(rental);
         video.rentals.add(rental);
 
@@ -59,6 +61,7 @@ public class RentalService
         {
             throw new RentalException.RentalNotFoundException("Rental with given ID could not be found");
         }
+        // Bidirectionality is maintained because r is reference to same object pulled from account.
         Rental r = corresponding.get();
         r.returnDate = new Date();
         r.fillStatus();

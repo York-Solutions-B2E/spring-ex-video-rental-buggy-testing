@@ -109,7 +109,7 @@ public class AccountTest {
         r.dueDate = new Date(100,0,3);
         r.status = Rental.RETURN_STATUS.RETURNED;
 
-        // comes from jackson
+        // comes from jackson, and is acting as jackson for the purpose of the test
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(this.account);
 
