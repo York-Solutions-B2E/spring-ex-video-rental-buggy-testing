@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public class AccountController
 {
-
     private AccountService accountService;
 
     @Autowired
@@ -24,6 +23,7 @@ public class AccountController
     {
         return this.accountService.register(u.username,u.password);
     }
+
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public Iterable<Account> getAll(@RequestParam String token)

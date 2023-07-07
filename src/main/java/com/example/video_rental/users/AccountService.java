@@ -15,7 +15,6 @@ import java.util.Optional;
 public class AccountService
 {
 
-
     private static final Integer length = 25;
     private final Map<String, Long> userTokenMap;
     private final AccountRepository repo;
@@ -32,7 +31,7 @@ public class AccountService
     }
     public Account login(String username, String password) throws AccountException
     {
-        var user = this.repo.getUserByPassword(username);
+        var user = this.repo.getAccountByUsername(username);
         if (user.isEmpty() || !user.get().password.equals(password))
         {
             throw new AccountException.InvalidLoginException();
@@ -51,7 +50,7 @@ public class AccountService
     public Account register(String username, String password)
     {
 
-        var existingUser = this.repo.getUserByPassword(username);
+        var existingUser = this.repo.getAccountByUsername(username);
         if(existingUser.isPresent())
         {
             throw new AccountException.InvalidLoginException("Username is already taken");

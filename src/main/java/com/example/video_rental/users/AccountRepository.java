@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends CrudRepository<Account, Long>
 {
-    Optional<Account> getUserByPassword(String username);
+    // should be "String password" not "String username"
+    Optional<Account> getAccountByUsername(String username);
 }
