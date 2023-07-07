@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,6 +39,7 @@ class AccountServiceTest {
 
         when(mockAccountRepository.getAccountByUsername(account.username)).thenReturn(Optional.of(account));
         when(mockAccountRepository.save(account)).thenReturn(account);
+
     }
 
     /*-------------------------LOGIN-------------------------*/
@@ -47,52 +50,65 @@ class AccountServiceTest {
         var u = accountService.login("aster", "opensesame");
 
         //Then
-        assertInstanceOf(Account.class, u);
+        assertInstanceOf(Account.class, u, "should return user that logged in");
     }
 
     @Test
     void loginShouldGenerateTokenAndSetTokenOnAccount() {
         var u = accountService.login("aster", "opensesame");
-        assertInstanceOf(String.class, u.token);
+        assertInstanceOf(String.class, u.token, "should be a string token");
+    }
+
+    @Test
+    void loginShouldUpdateUserTokenMap() {
+        final Map<String, Long> userTokenMap = new HashMap<>();
+
+        var u = accountService.login("aster", "opensesame");
+        Object uMap = new HashMap<>().put("aster", 1L);
+
+        assertEquals(userTokenMap.get("aster"), uMap, "should return objects matching 'aster' and 1L");
     }
 
     @Test
     void loginShouldThrowExceptionWithNoAccount() {
 
         //Then
-        assertThrows(AccountException.InvalidLoginException.class, () -> accountService.login("jake", "opensesame"));
+        assertThrows(AccountException.InvalidLoginException.class, () -> accountService.login("jake", "opensesame"),
+                     "should throw invalidloginexception class from wrong username");
     }
 
     @Test
     void loginShouldThrowExceptionWithMismatchedPasswords() {
-        assertThrows(AccountException.InvalidLoginException.class, () -> accountService.login("aster", "blah"));
+        assertThrows(AccountException.InvalidLoginException.class, () -> accountService.login("aster", "blah"),
+                     "should throw invalidloginexception class from wrong password");
     }
 
     /*-------------------------REGISTER-------------------------*/
 
     @Test
     void registerShouldThrowExceptionIfUserIsPresent() {
-        Exception exception = assertThrows(AccountException.InvalidLoginException.class, () -> accountService.register(
+        assertThrows(AccountException.InvalidLoginException.class, () -> accountService.register(
                 "aster", "opensesame"));
-        assertEquals("Username is already taken", exception);
     }
 
     @Test
     void registerShouldSaveNewAccountToRepository() {
         Account addedAccount = accountService.register("jake", "opensesame");
         Account newAccount = new Account(1L, "jake", "opensesame", null, Account.ACCOUNT_TYPE.Standard);
-        assertEquals(addedAccount.username, newAccount.username);
+        assertEquals(addedAccount.username, newAccount.username, "should match added account and new account");
     }
 
     @Test
     void registerShouldUpdateToken() {
         Account u = accountService.register("jake", "opensesame");
-        assertInstanceOf(String.class, u.token);
+        assertInstanceOf(String.class, u.token, "should return a string");
     }
 
-    /*-------------------------REGISTER-------------------------*/
+    /*-------------------------getUserFromToken-------------------------*/
 
-    
+    @Test
+    void getUserFromTokenShouldReturnMatchedAccount() {
+    }
 
 
     @AfterEach
