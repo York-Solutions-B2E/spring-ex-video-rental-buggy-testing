@@ -19,14 +19,19 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Arrays;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,14 +49,64 @@ class VideoControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private VideoController underTest;
 
+//    @Test
+//    void getAllVideosCallsServiceAllVideos() {
+//        underTest.getAllVideos();
+//        verify(underTest).getAllVideos().
+//    }
+
+
+
+    // integration test with client
     @Test
-    void getAllVideos() {
+    void getAllVideosGetsAllVideos() throws Exception {
+
+        Video testVideo = new Video();
+        testVideo.title = "The Lord of the Rings: The Fellowship of the Ring";
+        testVideo.image = "https://lotr.com/fotr.jpg";
+        Set<String> genres1 = Set.of("Action", "Fantasy", "Drama");
+        testVideo.genres = genres1;
+        testVideo.copies = 10;
+
+
+        Video video2 = new Video();
+        video2.title = "The Matrix";
+        video2.image = "https://thematrix.com/matrix.jpg";
+        Set<String> genres2 = Set.of("Action", "Sci-Fi");
+        video2.genres = genres2;
+        video2.copies = 5;
+
+        Iterable<Video> testVideos = Arrays.asList(testVideo, video2);
+
+        // BDD Mockito style
+//        given(videoService.allVideos()).willReturn(testVideos);
+
+        // Original Mockito style
+        when(videoService.allVideos()).thenReturn(testVideos);
+
+        ResultActions response = mockMvc.perform(get("/videos/all")
+                .contentType(MediaType.APPLICATION_JSON));
+
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$[0].title", is(testVideo.title)))
+                .andExpect(jsonPath("$[0].image", is(testVideo.image)))
+                .andExpect(jsonPath("$[0].copies", is(testVideo.copies)))
+                .andExpect(jsonPath("$[0].genres", containsInAnyOrder("Action", "Fantasy", "Drama")))
+                .andExpect(jsonPath("$[1].title", is(video2.title)))
+                .andExpect(jsonPath("$[1].image", is(video2.image)))
+                .andExpect(jsonPath("$[1].copies", is(video2.copies)))
+                .andExpect(jsonPath("$[1].genres", containsInAnyOrder("Action", "Sci-Fi")));
     }
 
     @Test
     void getAllInGenre() {
     }
+
+    // integration test with client
 
     @Test
     void createVideoReturnsCreated() throws Exception {
