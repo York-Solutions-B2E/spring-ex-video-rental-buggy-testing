@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -43,14 +42,14 @@ class VideoControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    // for replacing beans in integration tests
     @MockBean
     private VideoService videoService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private VideoController underTest;
+    // unit tests
 
 //    @Test
 //    void getAllVideosCallsServiceAllVideos() {
@@ -58,11 +57,34 @@ class VideoControllerTest {
 //        verify(underTest).getAllVideos().
 //    }
 
+    @Test
+    void createVideoShouldCallServiceAndReturnExpectedVideo() {
+        // Arrange
+        // Making a mock instead of using the one wired with @MockBean to keep separated from spring context
+        VideoService mockVideoService = mock(VideoService.class);
+        VideoController underTest = new VideoController(mockVideoService);
+
+        Video video = new Video();
+        video.title = "The Lord of the Rings: The Fellowship of the Ring";
+        video.image = "https://lotr.com/fotr.jpg";
+        video.genres = Set.of("Action", "Fantasy", "Drama");
+        video.copies = 10;
+        String token = "mockToken";
+
+        when(mockVideoService.createVideo(token, video)).thenReturn(video);
+
+        // Act
+        Video result = underTest.createVideo(token, video);
+
+        // Assert
+        assertEquals(video, result);
+    }
+
 
 
     // integration test with client
     @Test
-    void getAllVideosGetsAllVideos() throws Exception {
+    void allEndpointShouldGetAllVideos() throws Exception {
 
         Video testVideo = new Video();
         testVideo.title = "The Lord of the Rings: The Fellowship of the Ring";
@@ -102,6 +124,7 @@ class VideoControllerTest {
                 .andExpect(jsonPath("$[1].genres", containsInAnyOrder("Action", "Sci-Fi")));
     }
 
+
     @Test
     void getAllInGenre() {
     }
@@ -109,7 +132,7 @@ class VideoControllerTest {
     // integration test with client
 
     @Test
-    void createVideoReturnsCreated() throws Exception {
+    void createEndpointShouldReturnCreatedVideo() throws Exception {
 
         // given
         Video testVideo = new Video();
@@ -140,7 +163,7 @@ class VideoControllerTest {
                 .andExpect(jsonPath("$.image", is(testVideo.image)))
                 .andExpect(jsonPath("$.copies", is(testVideo.copies)))
                 .andExpect(jsonPath("$.genres", hasItems("Fantasy", "Action", "Drama")));
-                // good way to show what is being submitted
+        // good way to show what is being submitted
 //                .andDo(MockMvcResultHandlers.print());
 
     }
