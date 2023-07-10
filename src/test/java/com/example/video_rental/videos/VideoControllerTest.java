@@ -51,11 +51,64 @@ class VideoControllerTest {
 
     // unit tests
 
-//    @Test
-//    void getAllVideosCallsServiceAllVideos() {
-//        underTest.getAllVideos();
-//        verify(underTest).getAllVideos().
-//    }
+    @Test
+    void getAllVideosShouldCallServiceAndReturnIterableOfExpectedVideos() {
+        VideoService mockVideoService = mock(VideoService.class);
+        VideoController underTest = new VideoController(mockVideoService);
+
+        Video testVideo = new Video();
+        testVideo.title = "The Lord of the Rings: The Fellowship of the Ring";
+        testVideo.image = "https://lotr.com/fotr.jpg";
+        Set<String> genres1 = Set.of("Action", "Fantasy", "Drama");
+        testVideo.genres = genres1;
+        testVideo.copies = 10;
+
+
+        Video video2 = new Video();
+        video2.title = "The Matrix";
+        video2.image = "https://thematrix.com/matrix.jpg";
+        Set<String> genres2 = Set.of("Action", "Sci-Fi");
+        video2.genres = genres2;
+        video2.copies = 5;
+
+        Iterable<Video> testVideos = Arrays.asList(testVideo, video2);
+
+        when(mockVideoService.allVideos()).thenReturn(testVideos);
+
+        Iterable<Video> result = underTest.getAllVideos();
+
+        assertEquals(testVideos, result);
+    }
+
+    @Test
+    void getAllInGenreShouldCallServiceAndReturnIterableOfExpectedVideos() {
+
+        VideoService mockVideoService = mock(VideoService.class);
+        VideoController underTest = new VideoController(mockVideoService);
+
+        Video testVideo = new Video();
+        testVideo.title = "The Lord of the Rings: The Fellowship of the Ring";
+        testVideo.image = "https://lotr.com/fotr.jpg";
+        Set<String> genres1 = Set.of("Action", "Fantasy", "Drama");
+        testVideo.genres = genres1;
+        testVideo.copies = 10;
+
+
+        Video video2 = new Video();
+        video2.title = "The Matrix";
+        video2.image = "https://thematrix.com/matrix.jpg";
+        Set<String> genres2 = Set.of("Action", "Sci-Fi");
+        video2.genres = genres2;
+        video2.copies = 5;
+
+        Iterable<Video> testVideos = Arrays.asList(testVideo, video2);
+
+        when(mockVideoService.findVideos("Action")).thenReturn(testVideos);
+
+        Iterable<Video> result = underTest.getAllInGenre("Action");
+
+        assertEquals(testVideos, result);
+    }
 
     @Test
     void createVideoShouldCallServiceAndReturnExpectedVideo() {
@@ -80,9 +133,31 @@ class VideoControllerTest {
         assertEquals(video, result);
     }
 
+    @Test
+    void getVideoShouldCallServiceAndReturnExpectedVideo() {
+        // Arrange
+        VideoService mockVideoService = mock(VideoService.class);
+        VideoController underTest = new VideoController(mockVideoService);
+
+        Video video = new Video();
+        video.id = 1L;
+        video.title = "The Lord of the Rings: The Fellowship of the Ring";
+        video.image = "https://lotr.com/fotr.jpg";
+        video.genres = Set.of("Action", "Fantasy", "Drama");
+        video.copies = 10;
+
+        when(mockVideoService.getVideo(video.id)).thenReturn(video);
+
+        // Act
+        Video result = underTest.GetVideo(video.id);
+
+        // Assert
+        assertEquals(video, result);
+    }
 
 
-    // integration test with client
+    // Begin Integration tests using mocked client
+
     @Test
     void allEndpointShouldGetAllVideos() throws Exception {
 
@@ -111,6 +186,7 @@ class VideoControllerTest {
 
         ResultActions response = mockMvc.perform(get("/videos/all")
                 .contentType(MediaType.APPLICATION_JSON));
+        // .contentType("application/json") also works but MediaType is preferred
 
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(2)))
@@ -126,10 +202,40 @@ class VideoControllerTest {
 
 
     @Test
-    void getAllInGenre() {
-    }
+    void genreEndpointShouldReturnVideosByGenre() throws Exception {
+            Video testVideo = new Video();
+            testVideo.title = "The Lord of the Rings: The Fellowship of the Ring";
+            testVideo.image = "https://lotr.com/fotr.jpg";
+            Set<String> genres1 = Set.of("Action", "Fantasy", "Drama");
+            testVideo.genres = genres1;
+            testVideo.copies = 10;
 
-    // integration test with client
+
+            Video video2 = new Video();
+            video2.title = "The Matrix";
+            video2.image = "https://thematrix.com/matrix.jpg";
+            Set<String> genres2 = Set.of("Action", "Sci-Fi");
+            video2.genres = genres2;
+            video2.copies = 5;
+
+            Iterable<Video> testVideos = Arrays.asList(testVideo, video2);
+
+            when(videoService.findVideos("Action")).thenReturn(testVideos);
+
+            ResultActions response = mockMvc.perform(get("/videos/genre/Action")
+                    .contentType(MediaType.APPLICATION_JSON));
+
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$[0].title", is(testVideo.title)))
+                .andExpect(jsonPath("$[0].image", is(testVideo.image)))
+                .andExpect(jsonPath("$[0].copies", is(testVideo.copies)))
+                .andExpect(jsonPath("$[0].genres", containsInAnyOrder("Action", "Fantasy", "Drama")))
+                .andExpect(jsonPath("$[1].title", is(video2.title)))
+                .andExpect(jsonPath("$[1].image", is(video2.image)))
+                .andExpect(jsonPath("$[1].copies", is(video2.copies)))
+                .andExpect(jsonPath("$[1].genres", containsInAnyOrder("Action", "Sci-Fi")));
+    }
 
     @Test
     void createEndpointShouldReturnCreatedVideo() throws Exception {
@@ -169,6 +275,30 @@ class VideoControllerTest {
     }
 
     @Test
-    void getVideo() {
+    void getEndpointShouldReturnVideoById() throws Exception {
+
+        // given
+        Video testVideo = new Video();
+        testVideo.id = 1L; // assuming the Video class has a field named 'id'
+        testVideo.title = "The Lord of the Rings: The Fellowship of the Ring";
+        testVideo.image = "https://lotr.com/fotr.jpg";
+        Set<String> genres1 = Set.of("Action", "Fantasy", "Drama");
+        testVideo.genres = genres1;
+        testVideo.copies = 10;
+
+        // Stubbing the getVideo method to return the testVideo when the id 1L is passed
+        given(videoService.getVideo(testVideo.id)).willReturn(testVideo);
+
+        ResultActions response = mockMvc.perform(get("/videos/get?videoID=" + testVideo.id)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // used static import for MockMvcResultHandlers, hamcrest matchers and corematchers
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(testVideo.id.intValue()))) // assuming 'id' is a Long, needs to convert to int to compare
+                .andExpect(jsonPath("$.title", is(testVideo.title)))
+                .andExpect(jsonPath("$.image", is(testVideo.image)))
+                .andExpect(jsonPath("$.copies", is(testVideo.copies)))
+                .andExpect(jsonPath("$.genres", hasItems("Fantasy", "Action", "Drama")));
     }
+
 }
