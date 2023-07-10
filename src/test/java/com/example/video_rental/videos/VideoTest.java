@@ -6,14 +6,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DataJpaTest
 class VideoTest {
 
     private Video videoUnderTest;
+
+    @Autowired
+    VideoRepository videoRepository;
 
     @BeforeEach
     void setUp() {
@@ -21,6 +27,7 @@ class VideoTest {
 
     @AfterEach
     void tearDown() {
+        videoRepository.deleteAll();
     }
 
     // Unit tests
@@ -337,7 +344,7 @@ class VideoTest {
         assertEquals(vid.title, "The Lord of the Rings: The Two Towers", "Title should be The Lord of the Rings: The Two Towers");
         assertNull(vid.image, "Image should be null");
         assertNull(vid.genres, "Genres should be null");
-        assertEquals(vid.copies, null, "Copies should be 0");
+        assertEquals(vid.copies, null, "Copies should be null");
     }
 
     @Test
@@ -398,6 +405,7 @@ class VideoTest {
         });
     }
 
+
     @Test
     void deserializingInvalidDataTypesThrows() throws Exception {
         String json = "{"
@@ -416,8 +424,23 @@ class VideoTest {
     }
 
     // Integration with backend
-    // Test that a version of this class will function correctly in the back end
+    @Test
+    void savesProperly() {
 
+        videoUnderTest = new Video();
+
+        videoUnderTest.title = "The Lord of the Rings: The Fellowship of the Ring";
+        videoUnderTest.image = "https://lotr.com/fotr.jpg";
+        Set<String> genres1 = Set.of("Action", "Fantasy", "Drama");
+        videoUnderTest.genres = genres1;
+        videoUnderTest.copies = 10;
+
+        Video videoSentToBackend = videoRepository.save(videoUnderTest);
+
+        Video videoRecievedFromBackend = videoRepository.findById(videoSentToBackend.id).orElse(null);
+
+        assertEquals(videoRecievedFromBackend, videoUnderTest);
+    }
 
 
 

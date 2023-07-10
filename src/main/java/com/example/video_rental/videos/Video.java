@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -32,5 +33,18 @@ public class Video {
             return false; // or true, depending on what makes sense for your application
         }
         return (copies - rentals.size()) > 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Video video = (Video) o;
+        return Objects.equals(title, video.title) && Objects.equals(image, video.image) && Objects.equals(genres, video.genres) && Objects.equals(copies, video.copies) && Objects.equals(rentals, video.rentals);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, image, genres, copies, rentals);
     }
 }
