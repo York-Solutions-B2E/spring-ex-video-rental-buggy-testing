@@ -76,6 +76,29 @@ class VideoTest {
         assertFalse(expected);
     }
 
+    @Test
+    void isAvailableIsFalseWhenCopiesIsNull() {
+        // given
+        videoUnderTest = new Video();
+
+        videoUnderTest.id = 1L;
+        for(int i = 0; i < 3; i++){
+            videoUnderTest.rentals.add(new Rental());
+        }
+        videoUnderTest.genres = new HashSet<>();
+        videoUnderTest.genres.add("genre1");
+        videoUnderTest.genres.add("genre2");
+        videoUnderTest.image = "image";
+        videoUnderTest.copies = null;
+        videoUnderTest.title = "title";
+
+        // when
+        boolean expected = videoUnderTest.isAvailable();
+
+        // then
+        assertFalse(expected);
+    }
+
     // Integration tests
 
     @Test
@@ -443,6 +466,79 @@ class VideoTest {
     }
 
 
+    // Testing equals and hash code overrides, mostly for coverage reasons.
+
+    @Test
+    void testEqualsSameProperties() {
+        Video video1 = new Video();
+        video1.title = "The Lord of the Rings: The Fellowship of the Ring";
+        video1.image = "https://lotr.com/fotr.jpg";
+        video1.genres = Set.of("Action", "Fantasy", "Drama");
+        video1.copies = 10;
+
+        Video video2 = new Video();
+        video2.title = "The Lord of the Rings: The Fellowship of the Ring";
+        video2.image = "https://lotr.com/fotr.jpg";
+        video2.genres = Set.of("Action", "Fantasy", "Drama");
+        video2.copies = 10;
+
+        // They should be equal because their properties are the same.
+        assertEquals(video1, video2);
+    }
+
+    @Test
+    void testEqualsDifferentProperties() {
+        Video video1 = new Video();
+        video1.title = "The Lord of the Rings: The Fellowship of the Ring";
+        video1.image = "https://lotr.com/fotr.jpg";
+        video1.genres = Set.of("Action", "Fantasy", "Drama");
+        video1.copies = 10;
+
+        Video video2 = new Video();
+        video2.title = "The Matrix";
+        video2.image = "https://matrix.com/matrix.jpg";
+        video2.genres = Set.of("Action", "Sci-Fi");
+        video2.copies = 10;
+
+        // They should not be equal because their properties are different.
+        assertNotEquals(video1, video2);
+    }
+
+    @Test
+    void testHashCodeSameProperties() {
+        Video video1 = new Video();
+        video1.title = "The Lord of the Rings: The Fellowship of the Ring";
+        video1.image = "https://lotr.com/fotr.jpg";
+        video1.genres = Set.of("Action", "Fantasy", "Drama");
+        video1.copies = 10;
+
+        Video video2 = new Video();
+        video2.title = "The Lord of the Rings: The Fellowship of the Ring";
+        video2.image = "https://lotr.com/fotr.jpg";
+        video2.genres = Set.of("Action", "Fantasy", "Drama");
+        video2.copies = 10;
+
+        // They should have the same hashCode because their properties are the same.
+        assertEquals(video1.hashCode(), video2.hashCode());
+    }
+
+    @Test
+    void testHashCodeDifferentProperties() {
+        Video video1 = new Video();
+        video1.title = "The Lord of the Rings: The Fellowship of the Ring";
+        video1.image = "https://lotr.com/fotr.jpg";
+        video1.genres = Set.of("Action", "Fantasy", "Drama");
+        video1.copies = 10;
+
+        Video video2 = new Video();
+        video2.title = "The Matrix";
+        video2.image = "https://matrix.com/matrix.jpg";
+        video2.genres = Set.of("Action", "Sci-Fi");
+        video2.copies = 10;
+
+        // They should have different hashCodes because their properties are different.
+        assertNotEquals(video1.hashCode(), video2.hashCode());
+    }
 
 
 
