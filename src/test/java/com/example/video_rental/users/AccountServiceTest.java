@@ -15,6 +15,8 @@ import static org.mockito.Mockito.*;
 
 public class AccountServiceTest
 {
+
+    // Equivalent to AccountRepository repo = mock(AccountRepository.class)
     @Mock
     private AccountRepository repo;
 
@@ -24,6 +26,7 @@ public class AccountServiceTest
     @BeforeEach
     void setUp() throws Exception
     {
+        // initializes the @Mock variables
         MockitoAnnotations.openMocks(this);
     }
 
