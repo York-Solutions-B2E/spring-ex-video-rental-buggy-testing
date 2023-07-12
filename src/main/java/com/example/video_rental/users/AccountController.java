@@ -33,7 +33,8 @@ public class AccountController
 
 
     @PostMapping("/login")
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+//    @ResponseStatus(HttpStatus.FORBIDDEN) Bug!
+    @ResponseStatus(HttpStatus.OK)
     public Account login(@RequestBody Account u)
     {
         return this.accountService.login(u.username,u.password);

@@ -1,11 +1,13 @@
 package com.example.video_rental.users;
 
+import com.example.video_rental.utility.TokenUtility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,6 +22,9 @@ public class AccountServiceTest
     @Mock
     private AccountRepository repo;
 
+    @Mock
+    private TokenUtility tokenUtility;
+
     @InjectMocks
     private AccountService service;
 
@@ -29,6 +34,17 @@ public class AccountServiceTest
         // initializes the @Mock variables
         MockitoAnnotations.openMocks(this);
     }
+
+//    @Test   stopped when read that you don't need to test private methods directly
+//    void generateRandomTokenCallsTokenUtility() throws Exception
+//    {
+//        Method generateRandomToken = AccountService.class.getDeclaredMethod("generateRandomToken");
+//        generateRandomToken.setAccessible(true);
+//
+//        String token = (String) generateRandomToken.invoke(service);
+//        when(generateRandomToken.invoke(any())).thenReturn("token");
+//        service.g
+//    }
 
     @Test
     void shouldLogInSuccessfully()

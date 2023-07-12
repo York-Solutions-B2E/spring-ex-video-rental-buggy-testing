@@ -31,6 +31,7 @@ public class Account
     @Id
     public Long id;
 
+
     public ACCOUNT_TYPE accountType;
     public String username;
 

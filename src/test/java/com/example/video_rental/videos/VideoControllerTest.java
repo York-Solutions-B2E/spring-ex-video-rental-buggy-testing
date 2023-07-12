@@ -130,6 +130,7 @@ class VideoControllerTest {
         Video result = underTest.createVideo(token, video);
 
         // Assert
+        verify(mockVideoService).createVideo(any(), any());
         assertEquals(video, result);
     }
 
@@ -230,7 +231,9 @@ class VideoControllerTest {
                 .andExpect(jsonPath("$[0].title", is(testVideo.title)))
                 .andExpect(jsonPath("$[0].image", is(testVideo.image)))
                 .andExpect(jsonPath("$[0].copies", is(testVideo.copies)))
+                .andExpect(jsonPath("$[0].isAvailable").doesNotExist())
                 .andExpect(jsonPath("$[0].genres", containsInAnyOrder("Action", "Fantasy", "Drama")))
+                .andExpect(jsonPath("$[1].isAvailable").doesNotExist())
                 .andExpect(jsonPath("$[1].title", is(video2.title)))
                 .andExpect(jsonPath("$[1].image", is(video2.image)))
                 .andExpect(jsonPath("$[1].copies", is(video2.copies)))
@@ -298,6 +301,7 @@ class VideoControllerTest {
                 .andExpect(jsonPath("$.title", is(testVideo.title)))
                 .andExpect(jsonPath("$.image", is(testVideo.image)))
                 .andExpect(jsonPath("$.copies", is(testVideo.copies)))
+                .andExpect(jsonPath("$.isAvailable").doesNotExist())
                 .andExpect(jsonPath("$.genres", hasItems("Fantasy", "Action", "Drama")));
     }
 

@@ -45,10 +45,7 @@ class VideoRepositoryTest {
         savedVideo2 = underTest.save(video2);
     }
 
-    @AfterEach
-    void tearDown() {
-        underTest.deleteAll();
-    }
+
 
     @Test
     void itShouldGetActionVideosForAction() {

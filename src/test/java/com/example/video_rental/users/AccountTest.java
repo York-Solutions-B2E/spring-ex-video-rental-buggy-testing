@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertFalse;
 
 
 // Pulled from Max's example.
@@ -84,30 +85,31 @@ public class AccountTest {
     public void testJacksonSerialization() throws Exception
     {
         // given
-        // Making a list of one rental to give to new account
-        List<Rental> rentals = new ArrayList<>();
-        Rental r = new Rental();
+        // Making a rental and a video for new account
         Video v = new Video();
         v.id = 1L;
-        v.rentals.add(r);
         v.genres = new HashSet<>();
         v.genres.add("genre1");
         v.genres.add("genre2");
         v.image = "image";
         v.copies = 3;
         v.title = "title";
-        r.video = v;
-        rentals.add(r);
 
-        // can pass in rentals here and edit later because it's a reference variable
-        this.account = new Account(1L,"user1","pass1",rentals, Account.ACCOUNT_TYPE.Standard);
-        this.account.token = "token";
-        r.account = this.account;
+        Rental r = new Rental();
+        r.video = v;
         r.id = 2L;
         r.startDate = new Date(100,0,1);
         r.returnDate = new Date(100,0,2);
         r.dueDate = new Date(100,0,3);
         r.status = Rental.RETURN_STATUS.RETURNED;
+        v.rentals.add(r);
+
+        List<Rental> rentals = new ArrayList<>();
+        rentals.add(r);
+
+        this.account = new Account(1L,"user1","pass1",rentals, Account.ACCOUNT_TYPE.Standard);
+        this.account.token = "token";
+        r.account = this.account;
 
         // comes from jackson, and is acting as jackson for the purpose of the test
         ObjectMapper mapper = new ObjectMapper();
@@ -132,4 +134,6 @@ public class AccountTest {
         assertEquals(acc.rentals, new ArrayList<>() ,"Rentals should be empty list");
 
     }
+
+
 }

@@ -2,6 +2,7 @@ package com.example.video_rental.videos;
 
 import com.example.video_rental.users.AccountService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -34,8 +35,8 @@ class VideoServiceTest {
     }
 
     @Test
-    void getVideoShouldGetVideoIfExists() {
-
+    void getVideoShouldGetVideoIfExists()
+    {
         // Arrange
         Video video = new Video();
         video.id = 1L;
@@ -56,8 +57,8 @@ class VideoServiceTest {
     }
 
     @Test
-    void getVideoShouldThrowExceptionIfMissing() throws VideoException {
-
+    void getVideoShouldThrowExceptionIfMissing() throws VideoException
+    {
         // Set up our fake repo to act the way a repo would act
         // Arrange
         when(repo.findById(1L)).thenReturn(Optional.empty());
@@ -70,8 +71,8 @@ class VideoServiceTest {
     }
 
     @Test
-    void getAvailableVideoShouldGetOnlyGetVideoIfAvailable() {
-
+    void getAvailableVideoShouldGetOnlyGetVideoIfAvailable()
+    {
         Video video = new Video();
         video.id = 1L;
         video.title = "The Lord of the Rings: The Fellowship of the Ring";
@@ -88,8 +89,8 @@ class VideoServiceTest {
     }
 
     @Test
-    void getAvailableVideoShouldThrowIfNotAvailable() {
-
+    void getAvailableVideoShouldThrowIfNotAvailable()
+    {
         Long videoId = 1L;
         Video video = mock(Video.class);
 
@@ -102,9 +103,43 @@ class VideoServiceTest {
     }
 
     @Test
-    void createVideo() {
+    void createVideoShouldSaveAndReturnVideo()
+    {
+        Video video = new Video();
+        video.id = 1L;
+        video.title = "The Lord of the Rings: The Fellowship of the Ring";
+        video.image = "https://lotr.com/fotr.jpg";
+        Set<String> genres1 = Set.of("Action", "Fantasy", "Drama");
+        video.genres = genres1;
+        video.copies = 10;
 
+        String mockToken = "Mock Token";
+
+        when(repo.save(video)).thenReturn(video);
+        Video result = serviceUnderTest.createVideo(mockToken, video);
+
+        assertEquals(video, result);
     }
+
+//    @Test
+//    @Disabled
+//    void createVideoShouldSaveAndReturnVideo()
+//    {
+//        Video video = new Video();
+//        video.id = 1L;
+//        video.title = "The Lord of the Rings: The Fellowship of the Ring";
+//        video.image = "https://lotr.com/fotr.jpg";
+//        Set<String> genres1 = Set.of("Action", "Fantasy", "Drama");
+//        video.genres = genres1;
+//        video.copies = 10;
+//
+//        String mockToken = "Mock Token";
+//
+//        when(repo.save(video)).thenReturn(video);
+//        Video result = serviceUnderTest.createVideo(mockToken, video);
+//
+//        assertEquals(video, result);
+//    }
 
     @Test
     void findVideos() {
